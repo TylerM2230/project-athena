@@ -1,0 +1,52 @@
+
+> athena-server@1.0.0 start
+> node dist/index.js
+
+/home/kyotsketeh/project-athena/node_modules/bindings/bindings.js:126
+  err = new Error(
+        ^
+
+Error: Could not locate the bindings file. Tried:
+ → /home/kyotsketeh/project-athena/node_modules/better-sqlite3/build/better_sqlite3.node
+ → /home/kyotsketeh/project-athena/node_modules/better-sqlite3/build/Debug/better_sqlite3.node
+ → /home/kyotsketeh/project-athena/node_modules/better-sqlite3/build/Release/better_sqlite3.node
+ → /home/kyotsketeh/project-athena/node_modules/better-sqlite3/out/Debug/better_sqlite3.node
+ → /home/kyotsketeh/project-athena/node_modules/better-sqlite3/Debug/better_sqlite3.node
+ → /home/kyotsketeh/project-athena/node_modules/better-sqlite3/out/Release/better_sqlite3.node
+ → /home/kyotsketeh/project-athena/node_modules/better-sqlite3/Release/better_sqlite3.node
+ → /home/kyotsketeh/project-athena/node_modules/better-sqlite3/build/default/better_sqlite3.node
+ → /home/kyotsketeh/project-athena/node_modules/better-sqlite3/compiled/18.19.1/linux/x64/better_sqlite3.node
+ → /home/kyotsketeh/project-athena/node_modules/better-sqlite3/addon-build/release/install-root/better_sqlite3.node
+ → /home/kyotsketeh/project-athena/node_modules/better-sqlite3/addon-build/debug/install-root/better_sqlite3.node
+ → /home/kyotsketeh/project-athena/node_modules/better-sqlite3/addon-build/default/install-root/better_sqlite3.node
+ → /home/kyotsketeh/project-athena/node_modules/better-sqlite3/lib/binding/node-v109-linux-x64/better_sqlite3.node
+    at bindings (/home/kyotsketeh/project-athena/node_modules/bindings/bindings.js:126:9)
+    at new Database (/home/kyotsketeh/project-athena/node_modules/better-sqlite3/lib/database.js:48:64)
+    at new DatabaseService (file:///home/kyotsketeh/project-athena/server/dist/models/database.js:5:19)
+    at file:///home/kyotsketeh/project-athena/server/dist/models/database.js:164:19
+    at ModuleJob.run (node:internal/modules/esm/module_job:195:25)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:336:24)
+    at async loadESM (node:internal/process/esm_loader:34:7)
+    at async handleMainPromise (node:internal/modules/run_main:106:12) {
+  tries: [
+    '/home/kyotsketeh/project-athena/node_modules/better-sqlite3/build/better_sqlite3.node',
+    '/home/kyotsketeh/project-athena/node_modules/better-sqlite3/build/Debug/better_sqlite3.node',
+    '/home/kyotsketeh/project-athena/node_modules/better-sqlite3/build/Release/better_sqlite3.node',
+    '/home/kyotsketeh/project-athena/node_modules/better-sqlite3/out/Debug/better_sqlite3.node',
+    '/home/kyotsketeh/project-athena/node_modules/better-sqlite3/Debug/better_sqlite3.node',
+    '/home/kyotsketeh/project-athena/node_modules/better-sqlite3/out/Release/better_sqlite3.node',
+    '/home/kyotsketeh/project-athena/node_modules/better-sqlite3/Release/better_sqlite3.node',
+    '/home/kyotsketeh/project-athena/node_modules/better-sqlite3/build/default/better_sqlite3.node',
+    '/home/kyotsketeh/project-athena/node_modules/better-sqlite3/compiled/18.19.1/linux/x64/better_sqlite3.node',
+    '/home/kyotsketeh/project-athena/node_modules/better-sqlite3/addon-build/release/install-root/better_sqlite3.node',
+    '/home/kyotsketeh/project-athena/node_modules/better-sqlite3/addon-build/debug/install-root/better_sqlite3.node',
+    '/home/kyotsketeh/project-athena/node_modules/better-sqlite3/addon-build/default/install-root/better_sqlite3.node',
+    '/home/kyotsketeh/project-athena/node_modules/better-sqlite3/lib/binding/node-v109-linux-x64/better_sqlite3.node'
+  ]
+}
+
+Node.js v18.19.1
+npm ERR! Lifecycle script `start` failed with error: 
+npm ERR! Error: command failed 
+npm ERR!   in workspace: athena-server@1.0.0 
+npm ERR!   at location: /home/kyotsketeh/project-athena/server 
