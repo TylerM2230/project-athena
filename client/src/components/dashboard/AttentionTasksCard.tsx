@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+import { ExternalLink } from 'lucide-react';
 import { Task } from '../../types';
 import { getUrgencyLevel, isOverdue, getDaysUntilDue } from '../../utils/dateHelpers';
 
@@ -50,14 +52,23 @@ export function AttentionTasksCard({ tasks, loading }: AttentionTasksCardProps) 
   };
 
   return (
-    <div className="card">
-      <div className="flex items-center justify-between mb-4">
+    <div className="card h-full">
+      <div className="flex items-center justify-between mb-6">
         <h2 className="text-lg font-mono text-term-text">
           active items
         </h2>
-        <span className="text-xs font-mono text-term-text-dim">
-          {tasks.length}
-        </span>
+        <div className="flex items-center space-x-3">
+          <span className="text-xs font-mono text-term-text-dim bg-term-bg-alt px-2 py-1 rounded">
+            {tasks.length}
+          </span>
+          <Link
+            to="/tasks"
+            className="text-term-accent hover:text-term-text transition-colors"
+            title="View all tasks"
+          >
+            <ExternalLink className="h-4 w-4" />
+          </Link>
+        </div>
       </div>
       
       {loading ? (
@@ -71,20 +82,20 @@ export function AttentionTasksCard({ tasks, loading }: AttentionTasksCardProps) 
           ))}
         </div>
       ) : tasks.length === 0 ? (
-        <div className="text-center py-8 space-y-2 animate-fade-in">
-          <div className="text-term-accent font-mono text-2xl animate-bounce-subtle">○</div>
-          <p className="text-term-text-dim font-mono">no items</p>
-          <p className="text-xs text-term-text-dim font-mono">
-            nothing scheduled or in progress
+        <div className="text-center py-12 space-y-3 animate-fade-in">
+          <div className="text-term-accent font-mono text-3xl animate-bounce-subtle">○</div>
+          <p className="text-term-text font-mono text-lg">all clear</p>
+          <p className="text-sm text-term-text-dim font-mono">
+            no active items requiring attention
           </p>
         </div>
       ) : (
         <div className="space-y-3">
           {tasks.map((task, index) => (
-            <div 
+            <div
               key={task.id}
-              className="flex items-start justify-between py-3 px-2 -mx-2 rounded-lg border-b border-term-border last:border-b-0 
-                         hover:bg-term-bg-alt/50 hover:scale-[1.02] transition-all duration-200 animate-fade-in cursor-pointer group"
+              className="flex items-start justify-between py-4 px-3 -mx-3 rounded-lg border border-transparent
+                         hover:border-term-border/50 hover:bg-term-bg-alt/30 transition-all duration-200 animate-fade-in cursor-pointer group"
               style={{ animationDelay: `${index * 0.05}s`, animationFillMode: 'both' }}
             >
               <div className="flex items-start space-x-3 flex-1 min-w-0">
@@ -131,16 +142,29 @@ export function AttentionTasksCard({ tasks, loading }: AttentionTasksCardProps) 
           ))}
         </div>
       )}
-      
+
+      {/* Show link to full tasks page if there are tasks */}
       {tasks.length > 0 && (
-        <div className="mt-4 pt-3 border-t border-term-border">
-          <p className="text-xs font-mono text-term-text-dim">
-            Legend: <span className="text-term-error">!</span> overdue • 
-            <span className="text-term-error"> ●</span> urgent • 
-            <span className="text-term-warning"> ●</span> high • 
-            <span className="text-term-info"> ○</span> medium • 
-            <span className="text-term-text-dim"> ·</span> low
-          </p>
+        <div className="mt-6 pb-4 border-b border-term-border/50">
+          <Link
+            to="/tasks"
+            className="text-xs font-mono text-term-accent hover:text-term-text transition-colors flex items-center space-x-1"
+          >
+            <span>view all tasks</span>
+            <ExternalLink className="h-3 w-3" />
+          </Link>
+        </div>
+      )}
+
+      {tasks.length > 0 && (
+        <div className="mt-4 pt-4 border-t border-term-border/50">
+          <div className="text-xs font-mono text-term-text-dim space-x-4">
+            <span><span className="text-term-error">!</span> overdue</span>
+            <span><span className="text-term-error">●</span> urgent</span>
+            <span><span className="text-term-warning">●</span> high</span>
+            <span><span className="text-term-info">○</span> medium</span>
+            <span><span className="text-term-text-dim">·</span> low</span>
+          </div>
         </div>
       )}
     </div>

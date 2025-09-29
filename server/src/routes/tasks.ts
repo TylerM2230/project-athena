@@ -4,9 +4,9 @@ import { db } from '../models/database.js';
 const router = express.Router();
 
 // Get all tasks
-router.get('/', (_, res) => {
+router.get('/', async (_, res) => {
   try {
-    const tasks = db.getTasks();
+    const tasks = await db.getTasks();
     res.json(tasks);
   } catch (error) {
     console.error('Error fetching tasks:', error);
@@ -15,9 +15,9 @@ router.get('/', (_, res) => {
 });
 
 // Get single task
-router.get('/:id', (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
-    const task = db.getTask(req.params.id);
+    const task = await db.getTask(req.params.id);
     if (!task) {
       return res.status(404).json({ error: 'Task not found' });
     }
@@ -29,7 +29,7 @@ router.get('/:id', (req, res) => {
 });
 
 // Create task
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
   try {
     const { title, description, priority = 'medium', dueDate, parentId } = req.body;
     
@@ -37,7 +37,7 @@ router.post('/', (req, res) => {
       return res.status(400).json({ error: 'Title is required' });
     }
 
-    const task = db.createTask({
+    const task = await db.createTask({
       title,
       description,
       status: 'todo',
@@ -54,11 +54,11 @@ router.post('/', (req, res) => {
 });
 
 // Update task
-router.put('/:id', (req, res) => {
+router.put('/:id', async (req, res) => {
   try {
     const { title, description, status, priority, dueDate, parentId } = req.body;
     
-    const task = db.updateTask(req.params.id, {
+    const task = await db.updateTask(req.params.id, {
       title,
       description,
       status,
@@ -79,9 +79,9 @@ router.put('/:id', (req, res) => {
 });
 
 // Delete task
-router.delete('/:id', (req, res) => {
+router.delete('/:id', async (req, res) => {
   try {
-    const success = db.deleteTask(req.params.id);
+    const success = await db.deleteTask(req.params.id);
     if (!success) {
       return res.status(404).json({ error: 'Task not found' });
     }
@@ -92,30 +92,5 @@ router.delete('/:id', (req, res) => {
   }
 });
 
-// Get task's linked notes
-router.get('/:id/notes', (req, res) => {
-  try {
-    const notes = db.getTaskNotes(req.params.id);
-    res.json(notes);
-  } catch (error) {
-    console.error('Error fetching task notes:', error);
-    res.status(500).json({ error: 'Failed to fetch task notes' });
-  }
-});
-
-// Link note to task
-router.post('/:id/notes/:noteId', (req, res) => {
-  try {
-    const success = db.linkTaskNote(req.params.id, req.params.noteId);
-    if (success) {
-      res.status(204).send();
-    } else {
-      res.status(400).json({ error: 'Link already exists or invalid IDs' });
-    }
-  } catch (error) {
-    console.error('Error linking task note:', error);
-    res.status(500).json({ error: 'Failed to link task note' });
-  }
-});
 
 export default router;

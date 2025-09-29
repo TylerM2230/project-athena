@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@types/d3": "^7.4.3",
-    "react-d3-tree": "^3.6.6"
+    "react-d3-tree": "^3.6.6",
+    "sql.js": "^1.13.0"
   }
 }

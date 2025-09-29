@@ -3,7 +3,8 @@ import { Navigation } from './components/Navigation';
 import { ThemeProvider } from './components/ThemeProvider';
 import { Dashboard } from './pages/Dashboard';
 import { Tasks } from './pages/Tasks';
-import { Notes } from './pages/Notes';
+import { Habits } from './pages/Habits';
+import { Calendar } from './pages/Calendar';
 
 function App() {
   return (
@@ -14,7 +15,8 @@ function App() {
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/tasks" element={<Tasks />} />
-            <Route path="/notes" element={<Notes />} />
+            <Route path="/habits" element={<Habits />} />
+            <Route path="/calendar" element={<Calendar />} />
           </Routes>
         </main>
       </div>

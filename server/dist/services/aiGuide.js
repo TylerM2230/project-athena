@@ -11,26 +11,78 @@ class AiGuideService {
             console.warn('Gemini API key not configured. AI Guide will use fallback mode.');
         }
     }
+    // Strategic knowledge base for enhanced guidance
+    getStrategicContext(taskTitle, taskDescription) {
+        const title = taskTitle.toLowerCase();
+        const description = (taskDescription || '').toLowerCase();
+        // Strategic frameworks and approaches based on task type
+        const strategicFrameworks = {
+            project: {
+                context: "Strategic project management follows proven frameworks: Define vision → Break into phases → Identify critical path → Manage risks → Monitor progress.",
+                principles: ["Start with end in mind", "Identify dependencies early", "Build momentum with quick wins", "Plan for obstacles"]
+            },
+            learn: {
+                context: "Strategic learning follows the 70-20-10 model: 70% hands-on experience, 20% learning from others, 10% formal training.",
+                principles: ["Focus on application", "Learn from experts", "Practice deliberately", "Teach others to cement knowledge"]
+            },
+            business: {
+                context: "Strategic business development follows: Market research → Value proposition → MVP → Customer feedback → Iterate.",
+                principles: ["Validate assumptions early", "Focus on customer value", "Start small and scale", "Measure what matters"]
+            },
+            creative: {
+                context: "Strategic creative work follows: Divergent thinking → Convergent refinement → Prototype → Test → Iterate.",
+                principles: ["Generate many ideas first", "Refine ruthlessly", "Get feedback early", "Embrace iteration"]
+            },
+            problem: {
+                context: "Strategic problem-solving follows: Define precisely → Gather data → Generate alternatives → Evaluate systematically → Implement decisively.",
+                principles: ["Define the real problem", "Gather evidence", "Consider multiple solutions", "Act with confidence"]
+            }
+        };
+        // Determine primary strategic area
+        let primaryFramework = 'project'; // default
+        const content = title + ' ' + description;
+        if (content.includes('learn') || content.includes('study') || content.includes('research')) {
+            primaryFramework = 'learn';
+        }
+        else if (content.includes('business') || content.includes('startup') || content.includes('market')) {
+            primaryFramework = 'business';
+        }
+        else if (content.includes('create') || content.includes('design') || content.includes('write')) {
+            primaryFramework = 'creative';
+        }
+        else if (content.includes('problem') || content.includes('fix') || content.includes('solve')) {
+            primaryFramework = 'problem';
+        }
+        const framework = strategicFrameworks[primaryFramework];
+        return `Strategic Context for "${taskTitle}":
+
+${framework.context}
+
+Key Strategic Principles:
+${framework.principles.map((p, i) => `${i + 1}. ${p}`).join('\n')}
+
+Remember: Strategic success comes from clarity of vision, systematic execution, and adaptive learning.`;
+    }
     getSystemPrompt() {
-        return `You are Athena, a calm, patient, and insightful Socratic guide. Your purpose is to help users who feel overwhelmed break down large tasks into smaller, manageable steps.
+        return `You are Athena, the goddess of wisdom and strategic warfare, manifested as a strategic planning companion for neurodivergent individuals. You are calm, patient, insightful, and deeply understanding of how overwhelming chaos can feel. Your purpose is to help users transform overwhelming situations into empowered action.
 
-Your rules are:
-1. **Never give the full solution.** Your role is to ask guiding questions, not to do the work.
-2. **Always ask one open-ended question at a time.** Avoid asking multiple questions in a single response.
-3. **Keep your tone encouraging and non-judgmental.** Use phrases like "That's a great starting point," or "Let's explore that a bit more."
-4. **Base your next question on the user's previous answer.** Make the conversation feel natural and adaptive.
-5. **Focus on clarifying goals, identifying first steps, challenging assumptions, and uncovering potential obstacles.**
-6. If the user seems stuck, suggest a different angle (e.g., "What if we thought about this from the end and worked backwards?").
-7. **Only when the user explicitly asks for a plan** (e.g., "can you make a plan for me," "summarize this into steps"), should you provide a clear, actionable list of sub-tasks based on the entire conversation. Format this plan using markdown with headings and bullet points.
+Your approach embodies strategic wisdom:
+1. **Never overwhelm with full solutions.** Channel wisdom through guiding questions that help users discover their own path.
+2. **Ask one thoughtful question at a time.** Respect cognitive load limitations - multiple questions create decision paralysis.
+3. **Radiate empowerment and understanding.** Use language like "That shows real insight," "You're thinking strategically," or "Let's build on that wisdom."
+4. **Adapt to their energy and thinking patterns.** Notice when they need a different approach and pivot gracefully.
+5. **Focus on strategic clarity: vision, breaking down overwhelm, challenging limiting beliefs, and identifying leverage points.**
+6. **Offer alternative perspectives when they're stuck** (e.g., "What if we approached this like a strategic campaign?" or "What would the outcome look like if we worked backwards?").
+7. **When explicitly asked for strategic planning** (e.g., "create a plan," "what are the steps," "help me organize this"), provide a clear, actionable strategic framework based on your conversation.
 
-Question types to use strategically:
-- **Clarify the Goal**: "What does the finished version of this task look like to you?"
-- **Challenge Assumptions**: "What resources are you assuming you'll have for this?"
-- **Explore Steps**: "What is the very first physical action someone would need to take?"
-- **Identify Roadblocks**: "What part of this feels the most difficult or uncertain to you right now?"
-- **Examine Alternatives**: "If you only had half the time, what would be the most essential parts to complete?"
+Strategic questioning approaches:
+- **Clarify the Vision**: "What does victory look like for this objective?"
+- **Challenge Limiting Beliefs**: "What assumptions might be constraining your thinking here?"
+- **Identify Strategic Steps**: "What would be the most powerful first move?"
+- **Uncover Hidden Obstacles**: "What invisible barriers might emerge as you progress?"
+- **Find Leverage Points**: "Where could small actions create disproportionate impact?"
 
-Remember: You are a guide, not a doer. Help users discover their own path forward.`;
+Remember: You are Athena - wise, strategic, empowering. Help them see their own wisdom and strategic capability.`;
     }
     async startSocraticSession(taskId, taskTitle, taskDescription, apiKey) {
         const sessionId = `${taskId}-${Date.now()}`;
@@ -58,9 +110,21 @@ Remember: You are a guide, not a doer. Help users discover their own path forwar
         if (currentGenAI) {
             try {
                 const model = currentGenAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+                // Gather strategic context from knowledge base
+                const strategicContext = this.getStrategicContext(taskTitle, taskDescription);
                 const contextPrompt = `Task: "${taskTitle}"${taskDescription ? `\nDescription: "${taskDescription}"` : ''}
 
-This user has a task they find overwhelming. Start the Socratic dialogue by asking one thoughtful, open-ended question that will help them begin to break this down. Choose from clarifying the goal, exploring first steps, or understanding what makes this feel overwhelming.`;
+${strategicContext}
+
+This user has a strategic objective they find overwhelming. As Athena, use both your wisdom and the strategic context gathered above to provide superior guidance.
+
+Analyze if this task is too vague and needs clarification, or if it's specific enough to begin strategic decomposition.
+
+If the task is vague (lacks clear definition, scope, or measurable outcome), ask a clarifying question to help them define their vision more precisely.
+
+If the task is well-defined, start strategic guidance by asking one thoughtful question that will help them transform overwhelm into empowered action. Focus on vision, obstacles, or strategic starting points.
+
+Remember: You are channeling Athena's wisdom enhanced by strategic knowledge - be strategic, empowering, and focused on transformation.`;
                 const result = await model.generateContent({
                     contents: [
                         { role: "user", parts: [{ text: this.getSystemPrompt() }] },
@@ -85,15 +149,18 @@ This user has a task they find overwhelming. Start the Socratic dialogue by aski
         return { sessionId, question: initialQuestion };
     }
     getFallbackQuestion(taskTitle) {
-        // Simple logic to pick appropriate fallback question
+        // Athena's strategic wisdom for different task types
         if (taskTitle.toLowerCase().includes('write') || taskTitle.toLowerCase().includes('plan')) {
-            return "What does the finished version of this task look like to you?";
+            return "What does victory look like when this objective is complete?";
         }
         else if (taskTitle.toLowerCase().includes('learn') || taskTitle.toLowerCase().includes('study')) {
-            return "What's the very first physical action you would need to take?";
+            return "What would be the most powerful first move to gain this knowledge?";
+        }
+        else if (taskTitle.toLowerCase().includes('create') || taskTitle.toLowerCase().includes('build')) {
+            return "What's the strategic foundation that everything else will build upon?";
         }
         else {
-            return "What part of this feels the most difficult or uncertain right now?";
+            return "What invisible barriers might be making this feel overwhelming right now?";
         }
     }
     async continueConversation(sessionId, userMessage) {
@@ -163,15 +230,16 @@ Based on their response and our conversation so far, ask ONE follow-up question 
         return { question: nextQuestion, canGeneratePlan };
     }
     getFallbackFollowUp(messageCount) {
-        const fallbacks = [
-            "That's helpful context. What would be the very next concrete step you could take?",
-            "Interesting. What part of what you described feels most achievable right now?",
-            "I can see you're thinking this through. What resources or support do you already have available?",
-            "That makes sense. If you could only focus on one aspect to start, what would it be?",
-            "Good insight. What would success look like for just the first small piece of this?",
-            "That's a great start. What would need to happen for you to feel confident taking the first step?"
+        const strategicFollowUps = [
+            "That shows real strategic thinking. What would be your most powerful next move?",
+            "You're seeing this clearly. Which element feels most within your sphere of influence right now?",
+            "That's wise insight. What allies or resources could amplify your efforts here?",
+            "Strategic focus is key. If you could only advance one front, where would you concentrate your energy?",
+            "You're building a strong foundation. What would victory look like for just this first strategic objective?",
+            "That's the wisdom I see in you. What would need to align for you to move forward with confidence?",
+            "You're thinking like a strategist. What leverage points could create the biggest impact with minimal effort?"
         ];
-        return fallbacks[Math.min(messageCount - 2, fallbacks.length - 1)] || fallbacks[0];
+        return strategicFollowUps[Math.min(messageCount - 2, strategicFollowUps.length - 1)] || strategicFollowUps[0];
     }
     async generatePlan(sessionId) {
         const session = this.activeSessions.get(sessionId);
@@ -194,37 +262,43 @@ Based on their response and our conversation so far, ask ONE follow-up question 
         if (currentGenAI) {
             try {
                 const model = currentGenAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+                // Gather additional strategic context for planning
+                const strategicContext = this.getStrategicContext(session.taskTitle, session.taskDescription);
                 // Build conversation context
                 const conversationSummary = session.messages
                     .filter(msg => msg.role === 'user')
                     .map(msg => msg.content)
                     .join('\n');
-                const planPrompt = `Based on our Socratic dialogue about the task "${session.taskTitle}", generate a structured action plan. 
+                const planPrompt = `Based on our strategic dialogue about the objective "${session.taskTitle}", generate a structured action plan.
+
+Strategic context and best practices:
+${strategicContext}
 
 Key insights from our conversation:
 ${conversationSummary}
 
-Create a plan with:
-1. Clear, actionable sub-tasks
-2. Logical sequence/dependencies
-3. Realistic scope based on what the user revealed
+As Athena, create a strategic plan with:
+1. Clear, actionable strategic moves
+2. Logical sequence considering dependencies and momentum
+3. Realistic scope based on what the user revealed about their situation
 4. Each task should be specific enough that the user knows exactly what to do
+5. Incorporate strategic principles and best practices from the context above
 
-Format as a JSON array of tasks with this structure:
+Format as a JSON array of strategic moves with this structure:
 {
   "tasks": [
     {
-      "title": "Short, clear task title",
-      "description": "More detailed description of what to do",
+      "title": "Short, clear strategic move title",
+      "description": "More detailed description of what to do and why it's strategic",
       "priority": "high|medium|low",
       "estimatedTime": "rough time estimate",
       "dependencies": "what needs to be done first (optional)"
     }
   ],
-  "summary": "Brief explanation of the overall approach"
+  "summary": "Brief explanation of the overall strategic approach"
 }
 
-Remember: This should reflect what THEY discovered through our conversation, not what you think they should do.`;
+Remember: This should reflect what THEY discovered through our conversation, enhanced by strategic wisdom and best practices.`;
                 const result = await model.generateContent({
                     contents: [
                         { role: "user", parts: [{ text: this.getSystemPrompt() }] },
@@ -258,31 +332,37 @@ Remember: This should reflect what THEY discovered through our conversation, not
         }
     }
     getFallbackPlan(session) {
-        const fallbackTasks = [
+        const strategicTasks = [
             {
-                title: "Define the first concrete step",
-                description: `Based on our discussion about "${session.taskTitle}", identify the very first action you can take.`,
+                title: "Clarify your strategic vision",
+                description: `Based on our discussion about "${session.taskTitle}", define what victory looks like and the strategic outcome you're seeking.`,
                 priority: "high",
-                estimatedTime: "15-30 minutes"
+                estimatedTime: "20-30 minutes"
             },
             {
-                title: "Gather necessary resources",
-                description: "Collect the tools, information, or materials you identified as needed.",
-                priority: "medium",
-                estimatedTime: "30-60 minutes"
+                title: "Identify your power moves",
+                description: "Determine the most impactful first actions that will create momentum and advance your objective.",
+                priority: "high",
+                estimatedTime: "15-25 minutes"
             },
             {
-                title: "Create a detailed plan",
-                description: "Break down the main task into smaller, specific actions based on what you learned about yourself.",
+                title: "Assess your strategic assets",
+                description: "Catalog the resources, allies, skills, and tools you can leverage to achieve this objective.",
                 priority: "medium",
-                estimatedTime: "45 minutes"
+                estimatedTime: "20-30 minutes"
+            },
+            {
+                title: "Plan your strategic campaign",
+                description: "Design the sequence of moves that will efficiently transform your current state into your desired outcome.",
+                priority: "medium",
+                estimatedTime: "30-45 minutes"
             }
         ];
-        const fallbackPlan = {
-            tasks: fallbackTasks,
-            summary: "A basic action plan to help you get started. Customize these tasks based on your specific situation."
+        const strategicPlan = {
+            tasks: strategicTasks,
+            summary: "Athena's strategic framework to transform overwhelming objectives into empowered action. Customize these strategic moves based on your unique situation."
         };
-        return { question: `Starting plan created with ${fallbackPlan.tasks.length} tasks! You can customize them below.`, canGeneratePlan: true, plan: fallbackPlan };
+        return { question: `Strategic plan created with ${strategicPlan.tasks.length} strategic moves! Review and adapt them to match your situation.`, canGeneratePlan: true, plan: strategicPlan };
     }
     getSession(sessionId) {
         return this.activeSessions.get(sessionId);

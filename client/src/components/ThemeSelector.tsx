@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { Check, Palette } from 'lucide-react';
+import { Check, Palette, Shield, Eye } from 'lucide-react';
 import { useTheme } from '../hooks/useTheme';
 import type { ThemeCategory } from '../types/theme';
+import { getThemeWithAccessibility } from '../themes';
 import clsx from 'clsx';
 
 interface ThemePreviewProps {
@@ -11,14 +12,17 @@ interface ThemePreviewProps {
 }
 
 function ThemePreview({ theme, isSelected, onSelect }: ThemePreviewProps) {
+  const themeWithAccessibility = getThemeWithAccessibility(theme);
+  const accessibility = themeWithAccessibility.accessibility!;
+
   return (
     <button
       onClick={onSelect}
       className={clsx(
         "relative w-full p-4 rounded-lg border-2 transition-all duration-200",
         "hover:scale-105 hover:shadow-lg group",
-        isSelected 
-          ? "border-term-accent shadow-lg shadow-term-accent/20" 
+        isSelected
+          ? "border-term-accent shadow-lg shadow-term-accent/20"
           : "border-term-border hover:border-term-text-dim"
       )}
       style={{
@@ -30,25 +34,44 @@ function ThemePreview({ theme, isSelected, onSelect }: ThemePreviewProps) {
         {/* Header bar simulation */}
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-1">
-            <div 
+            <div
               className="w-2 h-2 rounded-full"
               style={{ backgroundColor: theme.colors.error }}
             />
-            <div 
+            <div
               className="w-2 h-2 rounded-full"
               style={{ backgroundColor: theme.colors.warning }}
             />
-            <div 
+            <div
               className="w-2 h-2 rounded-full"
               style={{ backgroundColor: theme.colors.success }}
             />
           </div>
-          {isSelected && (
-            <Check 
-              className="w-4 h-4" 
-              style={{ color: theme.colors.accent }}
-            />
-          )}
+          <div className="flex items-center space-x-1">
+            {/* Accessibility badge */}
+            {accessibility.wcagLevel === 'aaa' && (
+              <div title="AAA Accessibility">
+                <Shield
+                  className="w-3 h-3"
+                  style={{ color: theme.colors.success }}
+                />
+              </div>
+            )}
+            {accessibility.wcagLevel === 'aa' && (
+              <div title="AA Accessibility">
+                <Eye
+                  className="w-3 h-3"
+                  style={{ color: theme.colors.info }}
+                />
+              </div>
+            )}
+            {isSelected && (
+              <Check
+                className="w-4 h-4"
+                style={{ color: theme.colors.accent }}
+              />
+            )}
+          </div>
         </div>
         
         {/* Content simulation */}
@@ -116,7 +139,9 @@ function ThemeCategory({ category, themes, selectedTheme, onThemeSelect }: Theme
     professional: 'Professional',
     vintage: 'Vintage',
     futuristic: 'Futuristic',
-    minimal: 'Minimal'
+    minimal: 'Minimal',
+    creative: 'Creative',
+    'high-contrast': 'High Contrast'
   };
 
   return (
@@ -143,7 +168,7 @@ export function ThemeSelector() {
   const [selectedTheme, setSelectedTheme] = useState(currentTheme);
 
   const allThemes = getAvailableThemes();
-  const categories: ThemeCategory[] = ['professional', 'minimal', 'vintage', 'futuristic'];
+  const categories: ThemeCategory[] = ['professional', 'minimal', 'creative', 'vintage', 'futuristic', 'high-contrast'];
 
   const handleThemeSelect = (themeId: string) => {
     setSelectedTheme(themeId);
@@ -182,8 +207,42 @@ export function ThemeSelector() {
 
       {/* Current selection info */}
       <div className="mt-6 p-4 bg-term-bg-alt rounded-lg border border-term-border">
-        <div className="text-xs font-mono text-term-text-dim">
-          Current theme: <span className="text-term-accent">{allThemes.find(t => t.id === selectedTheme)?.name}</span>
+        <div className="space-y-2">
+          <div className="text-xs font-mono text-term-text-dim">
+            Current theme: <span className="text-term-accent">{allThemes.find(t => t.id === selectedTheme)?.name}</span>
+          </div>
+          {(() => {
+            const currentThemeData = allThemes.find(t => t.id === selectedTheme);
+            if (currentThemeData) {
+              const themeWithAccessibility = getThemeWithAccessibility(currentThemeData);
+              const accessibility = themeWithAccessibility.accessibility!;
+              return (
+                <div className="flex items-center space-x-4 text-xs font-mono">
+                  <div className="flex items-center space-x-1">
+                    {accessibility.wcagLevel === 'aaa' && (
+                      <>
+                        <Shield className="w-3 h-3 text-term-success" />
+                        <span className="text-term-success">AAA Accessible</span>
+                      </>
+                    )}
+                    {accessibility.wcagLevel === 'aa' && (
+                      <>
+                        <Eye className="w-3 h-3 text-term-info" />
+                        <span className="text-term-info">AA Accessible</span>
+                      </>
+                    )}
+                    {accessibility.wcagLevel === 'fail' && (
+                      <span className="text-term-warning">Limited Accessibility</span>
+                    )}
+                  </div>
+                  <div className="text-term-text-dim">
+                    Contrast: {accessibility.textOnBgRatio.toFixed(1)}:1
+                  </div>
+                </div>
+              );
+            }
+            return null;
+          })()}
         </div>
       </div>
     </div>

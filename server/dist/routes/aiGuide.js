@@ -23,11 +23,11 @@ router.post('/start', async (req, res) => {
         });
     }
     catch (error) {
-        console.error('Error starting Socratic session:', error);
+        console.error('Error starting Athena session:', error);
         res.status(500).json({
-            error: 'Failed to start AI guide session',
+            error: 'Failed to start Athena guidance session',
             fallback: true,
-            message: "Let's start by exploring what makes this task feel overwhelming. What part of it feels the most unclear or difficult to you right now?"
+            message: "I'm here to help you transform this challenge into empowered action. What invisible barriers are making this objective feel overwhelming right now?"
         });
     }
 });
@@ -52,7 +52,7 @@ router.post('/continue', async (req, res) => {
         res.status(500).json({
             error: 'Failed to continue conversation',
             fallback: true,
-            message: "That's interesting. What would be the very next step you could take to move forward?"
+            message: "That shows wisdom. What would be your most strategic next move to advance this objective?"
         });
     }
 });

@@ -1,13 +1,12 @@
 import { useState } from 'react';
-import { Clock, Timer, Zap } from 'lucide-react';
+import { Clock, Timer } from 'lucide-react';
 import { useEndOfDayCountdown } from '../../hooks/useEndOfDayCountdown';
 import { SevenSegmentDisplay } from './SevenSegmentDisplay';
 import { AnalogClock } from './AnalogClock';
-import { NixieTubeDisplay } from './NixieTubeDisplay';
 
 export function TimeCountdownCard() {
   const { hours, minutes, seconds, totalSeconds } = useEndOfDayCountdown();
-  const [displayMode, setDisplayMode] = useState<'digital' | 'analog' | 'nixie'>('digital');
+  const [displayMode, setDisplayMode] = useState<'digital' | 'analog'>('digital');
 
   const formatTime = (value: number, unit: string): string => {
     return `${value} ${unit}${value !== 1 ? 's' : ''}`;
@@ -25,12 +24,12 @@ export function TimeCountdownCard() {
   };
 
   return (
-    <div className="card">
-      <div className="flex items-center justify-between mb-4">
+    <div className="card h-full">
+      <div className="flex items-center justify-between mb-6">
         <h2 className="text-lg font-mono text-term-text">
           finite time
         </h2>
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-1">
           <button
             onClick={() => setDisplayMode('digital')}
             className={`p-2 rounded-md transition-colors border ${
@@ -53,30 +52,19 @@ export function TimeCountdownCard() {
           >
             <Clock size={16} />
           </button>
-          <button
-            onClick={() => setDisplayMode('nixie')}
-            className={`p-2 rounded-md transition-colors border ${
-              displayMode === 'nixie' 
-                ? 'border-term-accent text-term-accent bg-transparent' 
-                : 'border-transparent text-term-text-dim hover:text-term-text hover:border-term-text-dim'
-            }`}
-            title="Nixie tube display"
-          >
-            <Zap size={16} />
-          </button>
         </div>
       </div>
 
       <div className="space-y-4">
         {/* Philosophical message */}
-        <div className="text-center">
-          <p className="font-mono text-sm text-term-text-dim mb-2">
+        <div className="text-center space-y-2">
+          <p className="font-mono text-sm text-term-text-dim">
             you have
           </p>
-          <p className="font-mono text-lg text-term-text">
+          <p className="font-mono text-xl text-term-text leading-relaxed">
             {getTimePhrase()}
           </p>
-          <p className="font-mono text-sm text-term-text-dim mt-2">
+          <p className="font-mono text-sm text-term-text-dim">
             left in this day
           </p>
         </div>
@@ -84,29 +72,23 @@ export function TimeCountdownCard() {
         {/* Time display */}
         <div className="flex justify-center">
           {displayMode === 'digital' ? (
-            <SevenSegmentDisplay 
-              hours={hours} 
-              minutes={minutes} 
-              seconds={seconds} 
-            />
-          ) : displayMode === 'analog' ? (
-            <AnalogClock 
-              hours={hours} 
-              minutes={minutes} 
+            <SevenSegmentDisplay
+              hours={hours}
+              minutes={minutes}
               seconds={seconds}
-              totalSeconds={totalSeconds}
             />
           ) : (
-            <NixieTubeDisplay 
-              hours={hours} 
-              minutes={minutes} 
-              seconds={seconds} 
+            <AnalogClock
+              hours={hours}
+              minutes={minutes}
+              seconds={seconds}
+              totalSeconds={totalSeconds}
             />
           )}
         </div>
 
         {/* Meditation text */}
-        <div className="text-center pt-4 border-t border-term-border">
+        <div className="text-center pt-6 border-t border-term-border/50">
           <p className="font-mono text-xs text-term-text-dim italic">
             a reminder of our beautiful finitude
           </p>

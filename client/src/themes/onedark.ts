@@ -11,7 +11,7 @@ export const oneDarkTheme: Theme = {
     border: '#3e4451',
     surface: '#2c323c',
     text: '#dcdfe4',
-    textDim: '#7c8591',
+    textDim: '#9ca6b8',
     accent: '#61afef',
     warning: '#e5c07b',
     error: '#e06c75',

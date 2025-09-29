@@ -16,7 +16,8 @@ export function Navigation() {
   const navItems = [
     { path: '/', label: 'dashboard' },
     { path: '/tasks', label: 'tasks' },
-    { path: '/notes', label: 'notes' },
+    { path: '/habits', label: 'habits' },
+    { path: '/calendar', label: 'calendar' },
   ];
 
   const updateBlobPosition = () => {
@@ -39,15 +40,25 @@ export function Navigation() {
 
   useEffect(() => {
     setIsAnimating(true);
-    updateBlobPosition();
+    // Use requestAnimationFrame to ensure DOM is ready
+    requestAnimationFrame(() => {
+      updateBlobPosition();
+    });
     const timer = setTimeout(() => setIsAnimating(false), 400);
     return () => clearTimeout(timer);
   }, [location.pathname]);
 
   useEffect(() => {
-    updateBlobPosition();
+    // Delay initial positioning to ensure DOM is ready
+    const timer = setTimeout(() => {
+      updateBlobPosition();
+    }, 100);
+
     window.addEventListener('resize', updateBlobPosition);
-    return () => window.removeEventListener('resize', updateBlobPosition);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('resize', updateBlobPosition);
+    };
   }, []);
 
   return (

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Plus } from 'lucide-react';
-import { Task, CreateTaskRequest, Note } from '../types';
+import { Task, CreateTaskRequest } from '../types';
 import { AiSocraticGuide } from '../components/AiSocraticGuide';
 import { TaskTreeView } from '../components/tasks/TaskTreeView';
 import { TaskListView } from '../components/tasks/TaskListView';
@@ -8,14 +8,12 @@ import { ViewToggle } from '../components/tasks/ViewToggle';
 import { TaskFormInline } from '../components/tasks/TaskFormInline';
 import { TaskFilters, FilterOptions, SortOptions } from '../components/tasks/TaskFilters';
 import { filterTasks, sortTasks } from '../utils/taskFilters';
-import { parseNoteMentions, fetchMentionedNotes } from '../utils/noteParser';
 
 export function Tasks() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [selectedTaskForAI, setSelectedTaskForAI] = useState<Task | null>(null);
-  const [taskNotes, setTaskNotes] = useState<Record<string, Note[]>>({});
   const [viewMode, setViewMode] = useState<'list' | 'tree'>('list');
   const [filters, setFilters] = useState<FilterOptions>({
     status: 'all',
@@ -31,36 +29,20 @@ export function Tasks() {
   });
 
   useEffect(() => {
-    fetchTasksAndNotes();
+    fetchTasks();
   }, []);
 
   // Calculate filtered and sorted tasks
   const filteredTasks = filterTasks(tasks, filters);
   const sortedTasks = sortTasks(filteredTasks, sorting, tasks);
 
-  const fetchTasksAndNotes = async () => {
+  const fetchTasks = async () => {
     try {
       const tasksRes = await fetch('/api/tasks');
       const tasksData = await tasksRes.json();
       setTasks(tasksData);
-      
-      // Fetch linked notes for each task
-      const taskNotesData: Record<string, Note[]> = {};
-      await Promise.all(
-        tasksData.map(async (task: Task) => {
-          try {
-            const response = await fetch(`/api/tasks/${task.id}/notes`);
-            const linkedNotes = await response.json();
-            taskNotesData[task.id] = linkedNotes;
-          } catch (error) {
-            console.error(`Failed to fetch notes for task ${task.id}:`, error);
-            taskNotesData[task.id] = [];
-          }
-        })
-      );
-      setTaskNotes(taskNotesData);
     } catch (error) {
-      console.error('Failed to fetch data:', error);
+      console.error('Failed to fetch tasks:', error);
     } finally {
       setLoading(false);
     }
@@ -77,26 +59,7 @@ export function Tasks() {
       if (response.ok) {
         const createdTask = await response.json();
         
-        // Auto-link mentioned notes
-        if (taskData.description) {
-          const mentions = parseNoteMentions(taskData.description);
-          const mentionedNotes = await fetchMentionedNotes(mentions);
-          
-          // Link each mentioned note to the task
-          await Promise.all(
-            mentionedNotes.map(async (note) => {
-              try {
-                await fetch(`/api/tasks/${createdTask.id}/notes/${note.id}`, {
-                  method: 'POST'
-                });
-              } catch (error) {
-                console.error(`Failed to link note ${note.title} to task:`, error);
-              }
-            })
-          );
-        }
-
-        fetchTasksAndNotes();
+        fetchTasks();
       }
     } catch (error) {
       console.error('Failed to create task:', error);
@@ -106,7 +69,7 @@ export function Tasks() {
 
   const handleTasksCreated = () => {
     // Refresh tasks list to show new sub-tasks
-    fetchTasksAndNotes();
+    fetchTasks();
     setSelectedTaskForAI(null);
   };
 
@@ -119,7 +82,7 @@ export function Tasks() {
       });
 
       if (response.ok) {
-        fetchTasksAndNotes();
+        fetchTasks();
       }
     } catch (error) {
       console.error('Failed to update task:', error);
@@ -137,7 +100,7 @@ export function Tasks() {
       });
 
       if (response.ok) {
-        fetchTasksAndNotes();
+        fetchTasks();
       }
     } catch (error) {
       console.error('Failed to delete task:', error);
@@ -149,8 +112,8 @@ export function Tasks() {
     <div className="space-y-8">
       <div className="flex items-start justify-between gap-4 mb-6">
         <div className="flex-1">
-          <h1 className="title-terminal">tasks</h1>
-          <p className="subtitle-terminal">manage your tasks and break down complex projects with ai guidance</p>
+          <h1 className="title-terminal">strategic tasks</h1>
+          <p className="subtitle-terminal">organize your objectives and transform overwhelming projects into empowered action with Athena's guidance</p>
         </div>
         <div className="flex items-center gap-4 flex-shrink-0">
           <ViewToggle viewMode={viewMode} onViewChange={setViewMode} />
@@ -165,15 +128,17 @@ export function Tasks() {
         </div>
       </div>
 
-      {/* Filters */}
-      <TaskFilters
-        filters={filters}
-        sorting={sorting}
-        onFiltersChange={setFilters}
-        onSortingChange={setSorting}
-        taskCount={tasks.length}
-        filteredCount={sortedTasks.length}
-      />
+      {/* Compact Filters */}
+      <div className="mb-4">
+        <TaskFilters
+          filters={filters}
+          sorting={sorting}
+          onFiltersChange={setFilters}
+          onSortingChange={setSorting}
+          taskCount={tasks.length}
+          filteredCount={sortedTasks.length}
+        />
+      </div>
 
       {/* create task form */}
       {showCreateForm && (
@@ -197,11 +162,10 @@ export function Tasks() {
           ))}
         </div>
       ) : (
-        <div className="mt-6">
+        <div className="mt-2">
           {viewMode === 'tree' ? (
             <TaskTreeView
               tasks={sortedTasks}
-              taskNotes={taskNotes}
               onTaskUpdate={updateTask}
               onTaskDelete={deleteTask}
               onTaskSelect={setSelectedTaskForAI}
@@ -209,7 +173,6 @@ export function Tasks() {
           ) : (
             <TaskListView
               tasks={sortedTasks}
-              taskNotes={taskNotes}
               sortBy={sorting.sortBy as 'created' | 'priority' | 'deadline'}
               onTaskUpdate={updateTask}
               onTaskDelete={deleteTask}

@@ -60,14 +60,6 @@ export function SystemStatusCard({ stats, loading }: SystemStatusCardProps) {
             </div>
           </div>
 
-          <div className="pt-3 border-t border-term-border">
-            <div className="flex justify-between items-center">
-              <span className="font-mono text-sm text-term-text">notes</span>
-              <span className="font-mono text-sm text-term-text">
-                {stats.totalNotes}
-              </span>
-            </div>
-          </div>
 
           {/* AI Guide Status */}
           <div className="pt-3 border-t border-term-border">

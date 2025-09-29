@@ -224,14 +224,11 @@ export function TaskFormInline({ onSubmit, onCancel, parentId }: Props) {
             {/* Description */}
             <div className="md:col-span-2">
               <label className="block text-sm font-mono text-term-text mb-2">Description</label>
-              <div className="mb-2 text-xs font-mono text-term-text-dim">
-                <p>Use @note-title to reference notes and provide context for AI guidance</p>
-              </div>
               <textarea
                 value={task.description}
                 onChange={(e) => setTask({ ...task, description: e.target.value })}
                 className="w-full input-cyber resize-none"
-                placeholder="Describe your task... use @note-title to reference notes"
+                placeholder="Describe your task..."
                 rows={3}
                 disabled={isSubmitting}
               />

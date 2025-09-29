@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Send, X, Lightbulb, CheckCircle2 } from 'lucide-react';
 import { Task } from '../types';
-import { parseNoteMentions, fetchMentionedNotes, formatNotesForAI } from '../utils/noteParser';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -37,7 +36,6 @@ export function AiSocraticGuide({ task, onClose, onTasksCreated }: Props) {
   const [generatedPlan, setGeneratedPlan] = useState<GeneratedPlan | null>(null);
   const [editingTasks, setEditingTasks] = useState<GeneratedTask[]>([]);
   const [phase, setPhase] = useState<'questioning' | 'planning' | 'completed'>('questioning');
-  const [referencedNotes, setReferencedNotes] = useState<string[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -59,14 +57,6 @@ export function AiSocraticGuide({ task, onClose, onTasksCreated }: Props) {
   const startSession = async () => {
     setLoading(true);
     try {
-      // Parse @ mentions from task description and fetch related notes
-      const mentions = task.description ? parseNoteMentions(task.description) : [];
-      const mentionedNotes = await fetchMentionedNotes(mentions);
-      const noteContext = formatNotesForAI(mentionedNotes);
-      
-      // Store referenced note titles for display
-      setReferencedNotes(mentionedNotes.map(note => note.title));
-      
       const apiKey = localStorage.getItem('gemini_api_key');
       const response = await fetch('/api/ai-guide/start', {
         method: 'POST',
@@ -74,7 +64,7 @@ export function AiSocraticGuide({ task, onClose, onTasksCreated }: Props) {
         body: JSON.stringify({
           taskId: task.id,
           taskTitle: task.title,
-          taskDescription: (task.description || '') + noteContext,
+          taskDescription: task.description || '',
           apiKey: apiKey || undefined
         })
       });
@@ -295,9 +285,9 @@ export function AiSocraticGuide({ task, onClose, onTasksCreated }: Props) {
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-term-border">
           <div className="flex items-center">
-            <span className="text-term-accent font-mono mr-3">ai</span>
+            <div className="text-term-accent font-mono mr-3 text-xl">⚡</div>
             <div>
-              <h2 className="text-lg font-mono text-term-text">socratic guide</h2>
+              <h2 className="text-lg font-mono text-term-text">Athena's Strategic Guidance</h2>
               <p className="text-sm text-term-text-dim font-mono">breaking down: {task.title}</p>
             </div>
           </div>
@@ -306,20 +296,6 @@ export function AiSocraticGuide({ task, onClose, onTasksCreated }: Props) {
           </button>
         </div>
 
-        {/* Referenced Notes Indicator */}
-        {referencedNotes.length > 0 && (
-          <div className="border-b border-term-border bg-term-bg-alt px-6 py-3">
-            <div className="text-xs font-mono text-term-text-dim mb-1">referenced context:</div>
-            <div className="flex flex-wrap gap-2">
-              {referencedNotes.map((noteTitle, index) => (
-                <div key={index} className="flex items-center bg-term-bg border border-term-accent text-term-accent px-2 py-1 rounded text-xs font-mono">
-                  <span className="mr-1">@</span>
-                  {noteTitle}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
 
         {/* Messages */}
         <div className="flex-1 overflow-y-auto p-6 space-y-4">
@@ -355,8 +331,8 @@ export function AiSocraticGuide({ task, onClose, onTasksCreated }: Props) {
         {phase === 'planning' && generatedPlan && (
           <div className="border-t border-term-border bg-term-bg-alt p-4 max-h-64 overflow-y-auto">
             <div className="flex items-center mb-4">
-              <span className="text-term-accent font-mono mr-2">plan:</span>
-              <h3 className="font-mono text-term-text">generated action plan</h3>
+              <span className="text-term-accent font-mono mr-2">⚡ athena's plan:</span>
+              <h3 className="font-mono text-term-text">strategic action plan</h3>
             </div>
             
             {generatedPlan.summary && (

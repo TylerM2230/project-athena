@@ -1,0 +1,38 @@
+{
+  "tasks": [
+    {
+      "title": "Catch up on CS110A Assignments",
+      "description": "",
+      "status": "todo",
+      "priority": "high",
+      "id": "61fb0a74-7013-4f2f-a73d-3bde3ee5dfcf",
+      "createdAt": "2025-09-29T04:28:35.565Z",
+      "updatedAt": "2025-09-29T04:28:35.565Z"
+    }
+  ],
+  "goals": [],
+  "habits": [
+    {
+      "title": "Daily Reading",
+      "description": "Read for 30 minutes each morning",
+      "category": "learning",
+      "targetFrequency": "daily",
+      "targetCount": 1,
+      "isActive": true,
+      "icon": "📚",
+      "id": "fc3de27b-6cf6-46fe-b625-c94e67364727",
+      "createdAt": "2025-09-29T05:05:32.822Z",
+      "updatedAt": "2025-09-29T05:05:32.822Z"
+    }
+  ],
+  "habitEntries": [
+    {
+      "habitId": "fc3de27b-6cf6-46fe-b625-c94e67364727",
+      "date": "2025-09-29",
+      "status": "skipped",
+      "id": "88216057-8f8f-4383-9bd2-ef3f49839f2a",
+      "createdAt": "2025-09-29T05:05:40.176Z",
+      "updatedAt": "2025-09-29T05:15:37.311Z"
+    }
+  ]
+}
